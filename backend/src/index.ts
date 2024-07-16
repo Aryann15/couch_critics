@@ -33,8 +33,24 @@ app.post("/api/v1/user/signup", async (c) => {
   }
 });
 
-app.post("/api/v1/user/signin", (c) => {
-  return c.text("Hello form sign in");
+app.post("/api/v1/user/signin",async (c) => {
+  const body = await c.req.json()
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try{
+    const user = await prisma.user.findFirst({
+      where: {
+        email : body.email,
+        password: body.password,
+      }
+     
+    })
+    return c.text("welcome back")
+  }catch (e) {
+    return c.text("wrong email/password")
+  }
 });
 
 app.post("/api/v1/post", (c) => {
