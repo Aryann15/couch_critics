@@ -1,3 +1,5 @@
+import { PrismaClient } from "@prisma/client/edge";
+import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 
 export const postRouter = new Hono<{
@@ -7,22 +9,60 @@ export const postRouter = new Hono<{
   };
 }>();
 
-postRouter.get("/", (c) => {
-  return c.text("Hello Hono!");
+postRouter.get("/", async (c) => {
+  const body = await c.req.json();
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env?.DATABASE_URL,
+  }).$extends(withAccelerate());
+  const posts = await prisma.posts.create({
+    data: {
+      title: body.title,
+      content: body.content,
+      authorId: "2",
+    },
+  });
+  return c.json({
+    id: posts.id,
+  });
 });
 
-postRouter.post("/api/v1/post", (c) => {
-  return c.text("Hello from posts section");
+postRouter.put("/", async (c) => {
+  const body = await c.req.json();
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env?.DATABASE_URL,
+  }).$extends(withAccelerate());
+  const posts = await prisma.posts.update({
+    where: {
+      id: body.id,
+    },
+    data: {
+      title: body.title,
+      content: body.content,
+    },
+  });
+  return c.text("message updated");
 });
 
-postRouter.put("/api/v1/post", (c) => {
-  return c.text("Hello from hono");
+postRouter.get("/", async (c) => {
+  const body = await c.req.json();
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env?.DATABASE_URL,
+  }).$extends(withAccelerate());
+  const posts = await prisma.posts.findUnique({
+    where: {
+      id: body.id,
+    },
+  });
+  return c.json({
+    title: posts?.title,
+    content: posts?.content,
+  });
 });
 
-postRouter.get("/api/v1/post/:id", (c) => {
-  return c.text("Hello from hono");
-});
-
-postRouter.get("/api/v1/post/bulk", (c) => {
+postRouter.get("/bulk", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env?.DATABASE_URL,
+  }).$extends(withAccelerate());
+  const posts = await prisma.posts.findMany();
   return c.text("Hello from hono");
 });
