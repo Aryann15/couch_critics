@@ -1,4 +1,13 @@
+import { Link } from "react-router-dom";
+import { LabelInput } from "./Signup";
+import { useState } from "react";
+import { SigninInput } from "aryantech-couchcritics-common";
+
 export const Signin = () => {
+    const [signinInputs, setSigninInputs] = useState<SigninInput>({
+        username : "",
+        password : ""
+    })
   return (
     <div className="flex justify-center items-center font-mono bg-slate-100 min-h-screen">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md ">
@@ -6,21 +15,31 @@ export const Signin = () => {
           Sign in to your account
         </div>
         <div className="flex justify-center pb-4 text-base text-slate-700">
-          or sign up
+          or{" "}
+          <Link className="underline pl-2" to={"/signup"}>
+            {" "}
+            sign up
+          </Link>
         </div>
-        <div className="mt-6 font-semibold text-slate-700 text-sm">Email address </div>
-        <input
-          className="w-full rounded-md border-solid border-black border p-2 mb-3"
-          type="text"
-        />
-
-        <div className="flex justify-between mt-4">
-          <div className="font-semibold text-slate-700 text-sm">Password</div>
-          <div className="font-semibold text-slate-700 text-sm">Forgot password</div>
-        </div>
-        <input
-          className=" w-full rounded-md border-solid border-black border p-2 mb-3 "
-          type="password"
+        <LabelInput
+          label="username"
+          placeholder="aryantech158@gmail.com"
+          onChange={(e) => {
+            setSigninInputs({
+              ...signinInputs,
+              username: (e.target as HTMLInputElement).value,
+            });
+          }}
+        />{" "}
+        <LabelInput
+          label="password"
+          placeholder="******"
+          onChange={(e) => {
+            setSigninInputs({
+              ...signinInputs,
+              password: (e.target as HTMLInputElement).value,
+            });
+          }}
         />
         <div className=" bg-black w-full text-white text text-center rounded-md mt-5 p-2">
           <button>Submit</button>
